@@ -113,26 +113,29 @@ def fake_call():
 @pytest.fixture()
 def fake_docopt():
     docopt = main.docopt
+
     def fake_docopt(*args, **kwargs):
         return docopt(args[0], argv=["test", "test"])
     return fake_docopt
 
 
-def test_run_main(create_hurry_json, fake_call, fake_docopt):
+def test_run_main(create_hurry_json, fake_call, fake_docopt, capsys):
     create_hurry_json({"test <string>": "echo test > <string>"})
     os.chdir(os.path.dirname(__file__))
     main.call = fake_call
     main.docopt = fake_docopt
 
     main.main()
+    stdout, _ = capsys.readouterr()
+    assert stdout.strip() == "Execute: echo test > test"
     assert main.call.call_with == ["echo test > test", True]
 
 
-def test_run_main_without_hurry_json(fake_call, fake_docopt):
+def test_run_main_without_hurry_json(fake_call, fake_docopt, capsys):
     os.chdir(os.path.dirname(__file__))
     main.call = fake_call
     main.docopt = fake_docopt
 
-    sys.stdout = StringIO()
     main.main()
-    assert sys.stdout.getvalue().strip() == "Can't find hurry.json in the current folder"
+    stdout, _ = capsys.readouterr()
+    assert stdout.strip() == "Can't find hurry.json in the current folder"
