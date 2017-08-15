@@ -28,6 +28,7 @@ Usage:
     hurry hello
     hurry down
 /my_project$ hurry hello
+Execute: python -c "print('Hello, World!')"
 Hello, World!
 /my_project$
 ```
@@ -48,8 +49,10 @@ Usage:
     hurry hello
     hurry hello <name>
 ~/my_project$ hurry hello
+Execute: python -c "print('Hello, World!')"
 Hello, World!
 ~/my_project$ hurry hello "My Lord"
+Execute: python -c "print('Hello, My Lord!')"
 Hello, My Lord!
 ~/my_project$ 
 ```

@@ -15,7 +15,7 @@ requires = [
 setup(
     name="hurry",
     version=__version__,
-    description="Hurry manges your routine commands and scripts",
+    description="Hurry! helps you run your routine commands and scripts faster.",
     author="Roman Telichkin",
     author_email="roman@telichk.in",
     packages=find_packages(exclude=["tests"]),

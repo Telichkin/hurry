@@ -1,7 +1,5 @@
 import os
-import sys
 import json
-from io import StringIO
 from collections import OrderedDict
 
 import pytest
