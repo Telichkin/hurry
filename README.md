@@ -1,4 +1,5 @@
 # Hurry!
+[![Python versions](https://img.shields.io/badge/python-3%2B-blue.svg)](https://pypi.python.org/pypi/hurry)
 
 **Hurry!** helps you run your routine commands and scripts faster. It transforms commands like 
 ```docker-compose -f docker-compose.dev.yml up --build -d``` into ```hurry up```.
