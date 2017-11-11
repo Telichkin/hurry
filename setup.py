@@ -28,7 +28,7 @@ requires = [
 ]
 
 tests_require = [
-    "pytest==3.1.2",
+    "pytest",
     "pytest-cov",
 ]
 
