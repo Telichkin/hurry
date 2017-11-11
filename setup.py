@@ -21,6 +21,7 @@ setup(
     packages=find_packages(exclude=["tests"]),
     install_requires=requires,
     setup_requires=["pytest-runner"],
+    tests_require=["pytest==3.1.2"],
     entry_points="""
     [console_scripts]
     hurry=hurry.main:main
