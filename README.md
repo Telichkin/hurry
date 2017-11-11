@@ -1,4 +1,5 @@
 # Hurry!
+[![Build Status](https://travis-ci.org/Telichkin/hurry.svg?branch=master)](https://travis-ci.org/Telichkin/hurry)
 [![Python versions](https://img.shields.io/badge/python-3.3%2B-blue.svg)](https://pypi.python.org/pypi/hurry)
 
 **Hurry!** helps you run your routine commands and scripts faster. It transforms commands like 
