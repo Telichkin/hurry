@@ -1,9 +1,11 @@
 import os
+import sys
 import subprocess
 from collections import OrderedDict
 
 import pytest
 
+import hurry.main
 from hurry.utils import (
     CommandList,
     ExecChooser,
@@ -84,7 +86,7 @@ def test_config_reader_non_existing_file():
         assert True
 
 
-def test_run_hurry(create_hurry_json, tmpdir):
+def test_run_hurry_e2e(create_hurry_json, tmpdir):
     create_hurry_json({"write <file_path>": "echo \"this is e2e test\" > <file_path>"})
     test_file = tmpdir.join("test.txt")
 
@@ -94,20 +96,22 @@ def test_run_hurry(create_hurry_json, tmpdir):
     assert test_file.read().strip() == "this is e2e test"
 
 
-def test_run_hurry_without_hurry_json():
-    stdout = execute("hurry")
-    assert stdout.decode().strip() == "Can't find hurry.json in the current folder"
+def execute(command):
+    return subprocess.check_output("PYTHONPATH=.. python ../bin/{cmd}".format(cmd=command), shell=True)
+
+
+def test_run_hurry_without_hurry_json(capsys):
+    hurry.main.main()
+
+    stdout, _stderr = capsys.readouterr()
+    assert stdout.strip() == "Can't find hurry.json in the current folder"
 
 
 @pytest.mark.parametrize("content", ("\"-p wow! first with dash!\"", "\"first without dash\""))
 def test_run_hurry_with_many_args(create_hurry_json, tmpdir, content):
     create_hurry_json({"write <file_path> <content>": "echo \"<content>\" > <file_path>"})
     test_file = tmpdir.join("test.txt")
+    sys.argv[1:] = ["write", str(test_file), content]
 
-    execute("hurry write {file_path} {content}".format(file_path=test_file, content=content))
-
+    hurry.main.main()
     assert test_file.read().strip() == content.strip("\"")
-
-
-def execute(command):
-    return subprocess.check_output("PYTHONPATH=.. python ../bin/{cmd}".format(cmd=command), shell=True)
