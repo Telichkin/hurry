@@ -1,5 +1,6 @@
 import os
 import json
+from subprocess import check_output
 from collections import OrderedDict
 
 import pytest
@@ -97,43 +98,22 @@ def test_config_reader_non_existing_file():
         assert True
 
 
-@pytest.fixture()
-def fake_call():
-    class FakeCall:
-        def __init__(self):
-            self.call_with = None
-
-        def __call__(self, *args, **kwargs):
-            self.call_with = [args[0], kwargs["shell"]]
-    return FakeCall()
-
-
-@pytest.fixture()
-def fake_docopt():
-    docopt = main.docopt
-
-    def fake_docopt(*args, **kwargs):
-        return docopt(args[0], argv=["test", "test"])
-    return fake_docopt
-
-
-def test_run_main(create_hurry_json, fake_call, fake_docopt, capsys):
-    create_hurry_json({"test <string>": "echo test > <string>"})
+def test_run_main(create_hurry_json, tmpdir):
     os.chdir(os.path.dirname(__file__))
-    main.call = fake_call
-    main.docopt = fake_docopt
+    create_hurry_json({"write <file_path>": "echo \"this is e2e test\" > <file_path>"})
 
-    main.main()
-    stdout, _ = capsys.readouterr()
-    assert stdout.strip() == "Execute: echo test > test"
-    assert main.call.call_with == ["echo test > test", True]
+    test_file = tmpdir.join("test.txt")
+    stdout = execute("hurry write {}".format(test_file))
+
+    assert stdout.decode().strip() == "Execute: echo \"this is e2e test\" > {}".format(test_file)
+    assert test_file.read().strip() == "this is e2e test"
 
 
-def test_run_main_without_hurry_json(fake_call, fake_docopt, capsys):
+def test_run_main_without_hurry_json():
     os.chdir(os.path.dirname(__file__))
-    main.call = fake_call
-    main.docopt = fake_docopt
+    stdout = execute("hurry")
+    assert stdout.decode().strip() == "Can't find hurry.json in the current folder"
 
-    main.main()
-    stdout, _ = capsys.readouterr()
-    assert stdout.strip() == "Can't find hurry.json in the current folder"
+
+def execute(command):
+    return check_output("PYTHONPATH=.. python ../bin/{cmd}".format(cmd=command), shell=True)
