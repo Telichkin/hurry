@@ -1,12 +1,12 @@
 # Hurry!
 [![Build Status](https://travis-ci.org/Telichkin/hurry.svg?branch=master)](https://travis-ci.org/Telichkin/hurry)
-[![Python versions](https://img.shields.io/badge/python-3.3%2B-blue.svg)](https://pypi.python.org/pypi/hurry)
+[![Python versions](https://img.shields.io/badge/python-3.4%2B-blue.svg)](https://pypi.python.org/pypi/hurry)
 
 **Hurry!** helps you run your routine commands and scripts faster. It transforms commands like 
 ```docker-compose -f docker-compose.dev.yml up --build -d``` into ```hurry up```.
 
 ## Supported Python versions
-Current version works with Python 3.3+ only.
+Current version works with Python 3.4+ only.
 
 ## Install 
 ```pip3 install hurry```
