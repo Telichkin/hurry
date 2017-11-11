@@ -13,7 +13,7 @@ requires = [
 
 
 setup(
-    name="hurry-script",
+    name="hurry",
     version=__version__,
     description="Hurry! helps you run your routine commands and scripts faster.",
     author="Roman Telichkin",
@@ -23,6 +23,6 @@ setup(
     setup_requires=["pytest-runner"],
     entry_points="""
     [console_scripts]
-    hurry=bin.hurry
+    hurry=hurry.main:main
     """
 )

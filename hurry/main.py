@@ -19,7 +19,7 @@ def main():
 
     commands = CommandList(prefix="hurry")
     commands.add_config(config)
-    arguments = docopt(commands.to_string())
+    arguments = docopt(commands.to_string(), options_first=True)
     executable_str = ExecChooser(config).get_exec(arguments)
     print("Execute: " + executable_str)
     call(executable_str, shell=True)
