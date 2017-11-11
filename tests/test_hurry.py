@@ -1,15 +1,11 @@
 import os
-import json
-from subprocess import check_output
+import subprocess
 from collections import OrderedDict
 
-import pytest
-
-from hurry import main
 from hurry.utils import (
     CommandList,
     ExecChooser,
-    ConfigReader
+    ConfigReader,
 )
 
 
@@ -72,18 +68,6 @@ def test_choose_execution_with_variable():
     assert chooser.get_exec(parsed_arguments) == "this is var: foo bar"
 
 
-@pytest.fixture()
-def create_hurry_json():
-    path_to_file = os.path.join(os.path.dirname(__file__), "hurry.json")
-
-    def creator(dictionary):
-        with open(path_to_file, "w+") as hurry_json:
-            json.dump(dictionary, hurry_json)
-
-    yield creator
-    os.remove(path_to_file)
-
-
 def test_config_reader(create_hurry_json):
     create_hurry_json({"cmd": "some exec"})
     reader = ConfigReader(os.path.dirname(__file__))
@@ -99,7 +83,6 @@ def test_config_reader_non_existing_file():
 
 
 def test_run_main(create_hurry_json, tmpdir):
-    os.chdir(os.path.dirname(__file__))
     create_hurry_json({"write <file_path>": "echo \"this is e2e test\" > <file_path>"})
 
     test_file = tmpdir.join("test.txt")
@@ -110,10 +93,9 @@ def test_run_main(create_hurry_json, tmpdir):
 
 
 def test_run_main_without_hurry_json():
-    os.chdir(os.path.dirname(__file__))
     stdout = execute("hurry")
     assert stdout.decode().strip() == "Can't find hurry.json in the current folder"
 
 
 def execute(command):
-    return check_output("PYTHONPATH=.. python ../bin/{cmd}".format(cmd=command), shell=True)
+    return subprocess.check_output("PYTHONPATH=.. python ../bin/{cmd}".format(cmd=command), shell=True)
