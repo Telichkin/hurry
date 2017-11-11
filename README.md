@@ -3,56 +3,68 @@
 **Hurry!** helps you run your routine commands and scripts faster. It transforms commands like 
 ```docker-compose -f docker-compose.dev.yml up --build -d``` into ```hurry up```.
 
+## Supported Python versions
 Current version works with Python 3+ only.
 
 ## Install 
-```pip install hurry-script```
+```pip3 install hurry```
 
 ## Usage
 In the folder, where you want to use **Hurry!**, create *hurry.json* file with shortcuts:
-```json
-~/my_project/hurry.json
-
-{
-  "up": "docker-compose -f docker-compose.dev.yml up --build -d",
-  "hello": "python -c \"print('Hello, World!')\"",
-  "down": "docker-compose -f docker-compose.dev.yml down"
-}
+```bash
+$ cat ./hurry.json
+{ "hello": "echo Hello, World!" }
 ```
 
 Now you can use created shortcuts: 
-```
-~/my_project$ hurry --help
+```bash
+$ hurry --help
 Usage:
-    hurry up
     hurry hello
-    hurry down
-/my_project$ hurry hello
-Execute: python -c "print('Hello, World!')"
+
+$ hurry hello
+Execute: echo Hello, World!
 Hello, World!
-/my_project$
 ```
 
-**Hurry!** supports simple templating inside shortcuts:
-```json
-~/my_project/hurry.json
+### Templating
 
-{
-  "hello": "python -c \"print('Hello, World!')\"",
-  "hello <name>": "python -c \"print('Hello, <name>!')\""
-}
-```
+**Hurry!** supports simple templating inside shortcuts with `<template>` syntax:
+```bash
+$ cat ./hurry.json
+{ "hello <name>": "echo Hello, <name>!" }
 
-```
-~/my_project$ hurry --help
+$ hurry --help
 Usage:
-    hurry hello
     hurry hello <name>
-~/my_project$ hurry hello
-Execute: python -c "print('Hello, World!')"
-Hello, World!
-~/my_project$ hurry hello "My Lord"
-Execute: python -c "print('Hello, My Lord!')"
-Hello, My Lord!
-~/my_project$ 
+```
+
+Quotes are unnecessarily, when you use one-word argument:
+```bash
+$ hurry hello OneWord
+Execute: echo Hello, OneWord!
+Hello, OneWord!
+```
+
+Quotes are mandatory, when you use many-words argument or argument that starts with dash(-es):
+```bash
+$ hurry hello "Many Words"
+Execute: echo Hello, Many Words!
+Hello, Many Words!
+
+$ hurry hello "-words-starts-with-dash"
+Execute: echo Hello, -words-starts-with-dash!
+Hello, -words-starts-with-dash!
+```
+
+### Hurry inside Hurry
+
+It's possible to use already created commands inside **Hurry!**:
+```bash
+$ cat ./hurry.json
+{
+    "up": "docker-compose -f path/to/docker-compose.yml up -d",
+    "down": "docker-compose -f path/to/docker-compose.yml down",
+    "restart": "hurry up && hurry down"
+}
 ```
