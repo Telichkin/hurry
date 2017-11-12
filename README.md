@@ -68,6 +68,6 @@ $ cat ./hurry.json
 {
     "up": "docker-compose -f path/to/docker-compose.yml up -d",
     "down": "docker-compose -f path/to/docker-compose.yml down",
-    "restart": "hurry up && hurry down"
+    "restart": "hurry down && hurry up"
 }
 ```
