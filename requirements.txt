@@ -1,3 +1,4 @@
 docopt==0.6.2
-py==1.4.34
-pytest==3.1.2
+py==1.8.0
+pytest==5.0.1
+pytest-cov==2.7.1

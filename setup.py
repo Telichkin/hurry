@@ -6,25 +6,9 @@ from setuptools import (
     find_packages,
 )
 
-
-def read(*parts):
-    path = os.path.join(os.path.dirname(__file__), *parts)
-    with codecs.open(path, encoding='utf-8') as fobj:
-        return fobj.read()
-
-
-def find_version(*file_paths):
-    version_file = read(*file_paths)
-    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
-                              version_file, re.M)
-    if version_match:
-        return version_match.group(1)
-    raise RuntimeError("Unable to find version string.")
-
-
 requires = [
     "docopt==0.6.2",
-    "py==1.4.34"
+    "py==1.8.0"
 ]
 
 tests_require = [
@@ -35,7 +19,7 @@ tests_require = [
 
 setup(
     name="hurry",
-    version=find_version("hurry", "__init__.py"),
+    version="1.1",
     description="Hurry! helps you run your routine commands and scripts faster.",
     author="Roman Telichkin",
     author_email="roman@telichk.in",
@@ -45,6 +29,6 @@ setup(
     tests_require=tests_require,
     entry_points="""
     [console_scripts]
-    hurry=hurry.main:main
+    hurry=hurry:main
     """
 )

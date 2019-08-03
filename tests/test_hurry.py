@@ -5,95 +5,23 @@ from collections import OrderedDict
 
 import pytest
 
-import hurry.main
-from hurry.utils import (
-    CommandList,
-    ExecChooser,
-    ConfigReader,
-)
-
-
-def test_create_doc():
-    commands = CommandList(prefix="hurry")
-    commands.add_command("up")
-    assert commands.to_string() == "Usage:\n" \
-                                   "    hurry up"
-
-
-def test_create_doc_with_variable():
-    commands = CommandList(prefix="hurry")
-    commands.add_command("test <path>")
-    assert commands.to_string() == "Usage:\n" \
-                                   "    hurry test <path>"
-
-
-def test_create_doc_with_two_commands():
-    commands = CommandList(prefix="faster")
-    commands.add_command("up")
-    commands.add_command("test <test-name>")
-    assert commands.to_string() == "Usage:\n" \
-                                   "    faster up\n" \
-                                   "    faster test <test-name>"
-
-
-def test_create_doc_from_dict():
-    config = OrderedDict()
-    config["up <param>"] = "any shell command"
-    config["down"] = "other shell command"
-    commands = CommandList(prefix="conf")
-    commands.add_config(config)
-    assert commands.to_string() == "Usage:\n" \
-                                   "    conf up <param>\n" \
-                                   "    conf down"
-
-
-def test_choose_execution():
-    config = {
-        "up": "any shell command",
-        "down": "other command"
-    }
-    parsed_arguments = {
-        "up": True,
-        "down": False
-    }
-    chooser = ExecChooser(config=config)
-    assert chooser.get_exec(parsed_arguments) == "any shell command"
-
-
-def test_choose_execution_with_variable():
-    config = {
-        "up <var>": "this is var: <var>"
-    }
-    parsed_arguments = {
-        "up": True,
-        "<var>": "foo bar"
-    }
-    chooser = ExecChooser(config=config)
-    assert chooser.get_exec(parsed_arguments) == "this is var: foo bar"
-
-
-def test_config_reader(create_hurry_json):
-    create_hurry_json({"cmd": "some exec"})
-    reader = ConfigReader(os.path.dirname(__file__))
-    assert reader.get_dict() == {"cmd": "some exec"}
-
-
-def test_config_reader_non_existing_file():
-    try:
-        ConfigReader(os.path.dirname(__file__)).get_dict()
-        assert False, "FileNotFoundError did not rise"
-    except FileNotFoundError:
-        assert True
-
+import hurry
 
 def test_run_hurry_e2e(create_hurry_json, tmpdir):
-    create_hurry_json({"write <file_path>": "echo \"this is e2e test\" > <file_path>"})
+    create_hurry_json({
+        "write <file_path>": "echo 'this is e2e test' > <file_path>",
+        "read <file_path>": "cat <file_path>",
+    })
     test_file = tmpdir.join("test.txt")
 
-    stdout = execute("hurry write {}".format(test_file))
+    stdout = execute("hurry write " + str(test_file))
 
-    assert stdout.decode().strip() == "Execute: echo \"this is e2e test\" > {}".format(test_file)
+    assert stdout.decode().strip() == "Execute: echo 'this is e2e test' > " + str(test_file)
     assert test_file.read().strip() == "this is e2e test"
+
+    stdout = execute('hurry read some/path')
+
+    assert stdout.decode().strip() == 'Execute: cat some/path'
 
 
 def execute(command):
@@ -101,7 +29,7 @@ def execute(command):
 
 
 def test_run_hurry_without_hurry_json(capsys):
-    hurry.main.main()
+    hurry.main()
 
     stdout, _stderr = capsys.readouterr()
     assert stdout.strip() == "Can't find hurry.json in the current folder"
@@ -113,5 +41,5 @@ def test_run_hurry_with_many_args(create_hurry_json, tmpdir, content):
     test_file = tmpdir.join("test.txt")
     sys.argv[1:] = ["write", str(test_file), content]
 
-    hurry.main.main()
+    hurry.main()
     assert test_file.read().strip() == content.strip("\"")

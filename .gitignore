@@ -1,4 +1,8 @@
 .eggs/
 *.egg-info/
+.cache/
 build/
 dist/
+.coverage
+__pycache__/
+.pytest_cache/
