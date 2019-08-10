@@ -8,7 +8,7 @@ import pytest
 import hurry
 
 def test_generate_exec_str():
-    cmd = {
+    conf = {
         'one': 'one command',
         'two words': 'two words command',
         'start <name>': 'docker run <name>',
@@ -16,19 +16,22 @@ def test_generate_exec_str():
     }
 
     sys.argv = ['hurry', 'one']
-    assert hurry.generate_exec_str(cmd) == 'one command'
+    assert hurry.generate_exec_str(conf) == 'one command'
 
     sys.argv = ['hurry', 'two', 'words']
-    assert hurry.generate_exec_str(cmd) == 'two words command'
+    assert hurry.generate_exec_str(conf) == 'two words command'
 
     sys.argv = ['hurry', 'start', 'service']
-    assert hurry.generate_exec_str(cmd) == 'docker run service'
+    assert hurry.generate_exec_str(conf) == 'docker run service'
 
     sys.argv = ['hurry', 'end', 'test', 'prod']
-    assert hurry.generate_exec_str(cmd) == 'arg1=test arg2=prod'
+    assert hurry.generate_exec_str(conf) == 'arg1=test arg2=prod'
+    
+    sys.argv = ['hurry', 'one', '--', 'dynamic', 'arg']
+    assert hurry.generate_exec_str(conf) == 'one command dynamic arg'
 
     sys.argv = ['hurry', 'one', 'unknown']
-    assert hurry.generate_exec_str(cmd, ) is None
+    assert hurry.generate_exec_str(conf) is None
 
 def test_run_hurry_e2e(create_hurry_json, tmpdir):
     create_hurry_json({
