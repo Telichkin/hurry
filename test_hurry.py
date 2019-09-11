@@ -9,21 +9,16 @@ import pytest
 import hurry
 
 
-@pytest.fixture(autouse=True)
-def change_dir():
-    os.chdir(os.path.dirname(__file__))
-
-
 @pytest.fixture()
-def create_hurry_json():
-    path_to_file = os.path.join(os.path.dirname(__file__), "hurry.json")
+def create_hurry_json(tmpdir):
+    path_to_file = tmpdir.join('hurry.json')
+    os.chdir(os.path.dirname(path_to_file))
 
     def creator(dictionary):
         with open(path_to_file, "w+") as hurry_json:
             json.dump(dictionary, hurry_json)
 
-    yield creator
-    os.remove(path_to_file)
+    return creator
 
 
 def test_generate_exec_str():
@@ -79,10 +74,12 @@ def test_run_hurry_e2e(create_hurry_json, tmpdir):
 
 
 def execute(command):
-    return subprocess.check_output("PYTHONPATH=. python ./bin/{cmd}".format(cmd=command), shell=True)
+    src = os.path.abspath(os.path.dirname(__file__))
+    return subprocess.check_output("PYTHONPATH={src} python {src}/bin/{cmd}".format(src=src, cmd=command), shell=True)
 
 
-def test_run_hurry_without_hurry_json(capsys):
+def test_run_hurry_without_hurry_json(capsys, tmpdir):
+    os.chdir(tmpdir)
     hurry.main()
 
     stdout, _stderr = capsys.readouterr()
