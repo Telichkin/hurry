@@ -1,11 +1,30 @@
 import os
 import sys
+import json
 import subprocess
 from collections import OrderedDict
 
 import pytest
 
 import hurry
+
+
+@pytest.fixture(autouse=True)
+def change_dir():
+    os.chdir(os.path.dirname(__file__))
+
+
+@pytest.fixture()
+def create_hurry_json():
+    path_to_file = os.path.join(os.path.dirname(__file__), "hurry.json")
+
+    def creator(dictionary):
+        with open(path_to_file, "w+") as hurry_json:
+            json.dump(dictionary, hurry_json)
+
+    yield creator
+    os.remove(path_to_file)
+
 
 def test_generate_exec_str():
     conf = {
@@ -60,7 +79,7 @@ def test_run_hurry_e2e(create_hurry_json, tmpdir):
 
 
 def execute(command):
-    return subprocess.check_output("PYTHONPATH=.. python ../bin/{cmd}".format(cmd=command), shell=True)
+    return subprocess.check_output("PYTHONPATH=. python ./bin/{cmd}".format(cmd=command), shell=True)
 
 
 def test_run_hurry_without_hurry_json(capsys):
